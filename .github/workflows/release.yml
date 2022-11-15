@@ -4,7 +4,7 @@ on:
     - "v*.*.*"
 name: Release
 jobs:
-  release:
+  release-binary:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -40,11 +40,43 @@ jobs:
           && mkdir dist             \
           && mv my_bin dist/my_bin  \
           && tar -czvf my_bin-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz -C dist/ .
-    # RELEASE BIN
+
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
         files: my_bin-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
-    # BUILD DOCKER IMAGE
-    # PUSH DOCKER IMAGE 
+
+        #    - if: ${{ matrix.docker_image }}
+        #     name: Docker meta
+        #     id: meta
+        #     uses: docker/metadata-action@v4
+        #     with:
+        #       images: |
+        #         jsfpdn/my_bin
+        #          ghcr.io/jsfpdn/my_bin
+        #        tags: |
+        #          type=semver,pattern={{version}}
+
+  release-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Docker build & push
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        context: .
+        file: ./Dockerfile-release
+        build-args: |
+          VERSION=${{ github.ref_name }}
+        tags: |
+          jsfpdn/my_bin:${{ github.ref_name }}
+          jsfpdn/my_bin:latest
+          ghcr.io/jsfpdn/my_bin:${{ github.ref_name }}
+          ghcr.io/jsfpdn/my_bin:latest
 

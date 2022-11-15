@@ -1,5 +1,4 @@
 BIN = my_bin
-VERSION = UNKNOWN
 LDFLAGS = -X github.com/jsfpdn/congenial-sniffle/cmd.Version=$(VERSION)
 
 .PHONY: all
@@ -10,7 +9,7 @@ build-release: VERSION = $(shell git ls-remote --tags origin | tail -n 1 | cut -
 build-release: $(BIN)
 
 .PHONY: build
-build: VERSION = $(shell git rev-parse --short HEAD)
+build: VERSION ?= $(shell git rev-parse --short HEAD)
 build: $(BIN)
 
 $(BIN): **/*.go
