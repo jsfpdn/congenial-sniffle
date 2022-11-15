@@ -66,6 +66,12 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
@@ -75,7 +81,6 @@ jobs:
         push: true
         context: .
         file: ./Dockerfile-release
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         build-args: |
           VERSION=${{ github.ref_name }}
         tags: |
