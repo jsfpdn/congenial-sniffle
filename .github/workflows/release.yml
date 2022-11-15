@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [ linux, windows, darwin ]
+        goos: [ linux, darwin ]
         goarch: [ 386, arm64, amd64 ]
         exclude:
         - goarch: "386"
@@ -36,29 +36,15 @@ jobs:
         GOARCH: ${{ matrix.goarch }}
       shell: bash
       run: |
-        VERSION="$(git describe --tags | cut -d '-' -f1 | cut -d 'v' -f2)"
-        LDFLAGS="-X github.com/wandera/feature-instance-tools/cmd.Version=${VERSION}"
-        if [ "$GOOS" = "windows" ]; then
-          go build -ldflags "${LDFLAGS}" -v -o dist/fictl.exe && tar -czvf fictl-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz -C dist/ .
-        else
-          CGO_ENABLED=0 go build -ldflags "${LDFLAGS}" -v -o dist/fictl && tar -czvf fictl-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz -C dist/ .
-        fi
+        make build-release          \
+          && mkdir dist             \
+          && mv my_bin dist/my_bin  \
+          && tar -czvf my_bin-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz -C dist/ .
     # RELEASE BIN
     - name: Release
-      uses: wandera/action-gh-release@v1
+      uses: softprops/action-gh-release@v1
       with:
-        files: fictl-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+        files: my_bin-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
     # BUILD DOCKER IMAGE
     # PUSH DOCKER IMAGE 
-  homebrew:
-    runs-on: ubuntu-latest
-    needs: release
-    steps:
-    - name: Bump Homebrew formula
-      uses: wandera/bump-homebrew-formula-action@v1
-      env:
-        COMMITTER_TOKEN: ${{ secrets.BREW_TOKEN }}
-      with:
-        formula-name: fictl
-        download-url: git@github.com:wandera/feature-instance-tools.git
-        homebrew-tap: wandera/homebrew-wandera
+
