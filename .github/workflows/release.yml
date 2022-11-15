@@ -1,8 +1,15 @@
+name: Release
+
 on:
   push:
     tags:
     - "v*.*.*"
-name: Release
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  TAG: ${{ github.ref_name }}
+
 jobs:
   release-binary:
     runs-on: ubuntu-latest
@@ -46,17 +53,6 @@ jobs:
       with:
         files: my_bin-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
 
-        #    - if: ${{ matrix.docker_image }}
-        #     name: Docker meta
-        #     id: meta
-        #     uses: docker/metadata-action@v4
-        #     with:
-        #       images: |
-        #         jsfpdn/my_bin
-        #          ghcr.io/jsfpdn/my_bin
-        #        tags: |
-        #          type=semver,pattern={{version}}
-
   release-docker-image:
     runs-on: ubuntu-latest
     steps:
@@ -79,11 +75,12 @@ jobs:
         push: true
         context: .
         file: ./Dockerfile-release
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         build-args: |
           VERSION=${{ github.ref_name }}
         tags: |
-          jsfpdn/my_bin:${{ github.ref_name }}
+          jsfpdn/my_bin:${{ env.TAG }}
           jsfpdn/my_bin:latest
-          ghcr.io/jsfpdn/my_bin:${{ github.ref_name }}
+          ghcr.io/jsfpdn/my_bin:${{ env.TAG }}
           ghcr.io/jsfpdn/my_bin:latest
 
