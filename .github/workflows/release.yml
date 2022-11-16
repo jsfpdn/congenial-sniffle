@@ -84,8 +84,8 @@ jobs:
         build-args: |
           VERSION=${{ github.ref_name }}
         tags: |
-          jsfpdn/my_bin:${{ env.TAG }}
-          jsfpdn/my_bin:latest
-          ghcr.io/jsfpdn/my_bin:${{ env.TAG }}
-          ghcr.io/jsfpdn/my_bin:latest
+          jsfpdn/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          jsfpdn/${{ env.IMAGE_NAME }}:latest
+          ghcr.io/jsfpdn/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          ghcr.io/jsfpdn/${{ env.IMAGE_NAME }}:latest
 
