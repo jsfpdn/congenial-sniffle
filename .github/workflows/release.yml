@@ -59,13 +59,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Log in to the Container registry
-      uses: docker/login-action@v2
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@v4
@@ -77,17 +70,26 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
+    - name: Log in to the Container registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Docker build & push
       uses: docker/build-push-action@v3
       with:
         push: true
         context: .
         file: ./Dockerfile-release
+          # ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          # ${{ env.IMAGE_NAME }}:latest
+          # ghcr.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          # ghcr.io/${{ env.IMAGE_NAME }}:latest
         build-args: |
           VERSION=${{ github.ref_name }}
         tags: |
-          ${{ env.IMAGE_NAME }}:${{ env.TAG }}
-          ${{ env.IMAGE_NAME }}:latest
-          ghcr.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
-          ghcr.io/${{ env.IMAGE_NAME }}:latest
+          jsfpdn/congenial-sniffle
+
 
