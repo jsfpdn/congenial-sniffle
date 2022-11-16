@@ -55,17 +55,19 @@ jobs:
 
   release-docker-image:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
     steps:
     - name: Checkout
       uses: actions/checkout@v3
 
-        #    - name: Extract metadata (tags, labels) for Docker
-        #id: meta
-        #uses: docker/metadata-action@v4
-        #with:
-          # ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          #images: |
-          #${{ env.REGISTRY}}/${{ env.IMAGE_NAME }}
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -83,13 +85,8 @@ jobs:
         push: true
         context: .
         file: ./Dockerfile-release
-          # ${{ env.IMAGE_NAME }}:${{ env.TAG }}
-          # ${{ env.IMAGE_NAME }}:latest
-          # ghcr.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
-          # ghcr.io/${{ env.IMAGE_NAME }}:latest
         build-args: |
           VERSION=${{ github.ref_name }}
-        tags: |
-          jsfpdn/congenial-sniffle
+        tags: ${{ steps.meta.outputs.tags }}
 
 
