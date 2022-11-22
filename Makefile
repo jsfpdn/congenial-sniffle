@@ -1,5 +1,6 @@
 BIN = my_bin
 LDFLAGS = -X github.com/jsfpdn/congenial-sniffle/cmd.Version=$(VERSION)
+CGO_ENABLED ?= 1
 
 .PHONY: all
 all: clean build
@@ -14,7 +15,7 @@ build: $(BIN)
 
 $(BIN): **/*.go
 	test $(VERSION) || (echo "version not set"; exit 1)
-	go build -ldflags="$(LDFLAGS)" -o $(BIN) .
+	CGO_ENABLED=$(CGO_ENABLED) go build -ldflags="$(LDFLAGS)" -o $(BIN) .
 
 .PHONY: clean
 clean:
