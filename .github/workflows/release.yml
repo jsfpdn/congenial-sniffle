@@ -17,6 +17,11 @@ jobs:
       matrix:
         goos: [ linux, darwin ]
         goarch: [ 386, arm64, amd64 ]
+        include:
+        - cgo: 0
+        - cgo: 1
+          goos: linux
+          goarch: amd64
         exclude:
         - goarch: "386"
           goos: darwin
@@ -41,6 +46,7 @@ jobs:
       env:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
+        CGO_ENABLED: ${{ matrix.cgo }}
       shell: bash
       run: |
         make build-release          \
